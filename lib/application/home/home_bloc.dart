@@ -24,7 +24,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
     emit(state.copyWith(getHomeInfoStatus: GetHomeInfoStatus.loading));
     final result = await homeScreenRepositories.getTopRepositories(GetTopRepositoriesParams(
-        pageNumber: (state.repositories.length / DesignHelper.maxPaginationNumber).ceil()));
+        pageNumber: ((state.repositories.length / DesignHelper.maxPaginationNumber).ceil()) + 1));
     emit(
       result.fold(
         (l) => state.copyWith(getHomeInfoStatus: GetHomeInfoStatus.failed, failure: l),

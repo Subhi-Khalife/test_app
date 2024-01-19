@@ -29,6 +29,6 @@ class GetTopRepositoriesParams {
 
   Map<String, dynamic> getParam() => {
         "page": pageNumber.toString(),
-        "q": "created:>2017-10-22",
+        "q": "created:>2024-01-18",
       };
 }
