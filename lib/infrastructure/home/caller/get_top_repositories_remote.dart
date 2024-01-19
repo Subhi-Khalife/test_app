@@ -24,11 +24,16 @@ class GetTopRepositoriesRemote {
 }
 
 class GetTopRepositoriesParams {
-  GetTopRepositoriesParams({required this.pageNumber});
+  GetTopRepositoriesParams({
+    required this.pageNumber,
+    required this.perPage,
+  });
   int pageNumber;
+  int perPage;
 
   Map<String, dynamic> getParam() => {
         "page": pageNumber.toString(),
         "q": "created:>2024-01-18",
+        'per_page': perPage.toString(),
       };
 }

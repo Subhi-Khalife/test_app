@@ -16,11 +16,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late HomeBloc homeBloc;
+  late ScrollController scrollController;
   @override
   void initState() {
     super.initState();
     homeBloc = serviceLocator<HomeBloc>();
     homeBloc.add(GetHomeScreenTopRepositoriesEvent());
+    scrollController = ScrollController()..addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    homeBloc.close();
+    scrollController.dispose();
   }
 
   @override
@@ -52,13 +61,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               }
               return CustomScrollView(
+                controller: scrollController,
                 slivers: <Widget>[
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        if (!state.hasReachedMax && index == state.repositories.length - 3) {
-                          homeBloc.add(GetHomeScreenTopRepositoriesEvent());
-                        }
                         return Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: RepostioriesListItem(repository: state.repositories[index]),
@@ -79,5 +86,18 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      homeBloc.add(GetHomeScreenTopRepositoriesEvent());
+    }
+  }
+
+  bool get _isBottom {
+    if (!scrollController.hasClients) return false;
+    final maxScroll = scrollController.position.maxScrollExtent;
+    final currentScroll = scrollController.offset;
+    return currentScroll >= (maxScroll * 0.93);
   }
 }

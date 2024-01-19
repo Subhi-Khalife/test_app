@@ -23,8 +23,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       return;
     }
     emit(state.copyWith(getHomeInfoStatus: GetHomeInfoStatus.loading));
-    final result = await homeScreenRepositories.getTopRepositories(GetTopRepositoriesParams(
-        pageNumber: ((state.repositories.length / DesignHelper.maxPaginationNumber).ceil()) + 1));
+    final result = await homeScreenRepositories.getTopRepositories(
+      GetTopRepositoriesParams(
+        pageNumber: ((state.repositories.length / DesignHelper.maxPaginationNumber).ceil()) + 1,
+        perPage: DesignHelper.maxPaginationNumber,
+      ),
+    );
     emit(
       result.fold(
         (l) => state.copyWith(getHomeInfoStatus: GetHomeInfoStatus.failed, failure: l),

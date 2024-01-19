@@ -65,13 +65,8 @@ void main() {
           hasReachedMax: false),
       HomeState(
           getHomeInfoStatus: GetHomeInfoStatus.success,
-          repositories: [...expectedPaginationList, ...expectedPaginationList],
+          repositories: List.of(expectedPaginationList)..addAll(expectedPaginationList),
           hasReachedMax: false),
-      HomeState(
-        getHomeInfoStatus: GetHomeInfoStatus.success,
-        repositories: List.of(expectedPaginationList)..addAll(expectedPaginationList),
-        hasReachedMax: false,
-      ),
     ];
 
     blocTest(
@@ -106,6 +101,39 @@ void main() {
       setUp: () {
         when(mockHomeScreenRepositoriesImpl.getTopRepositories(any))
             .thenAnswer((_) async => Left(ServerFailure()));
+      },
+      verify: (bloc) {
+        verify(mockHomeScreenRepositoriesImpl.getTopRepositories(any)).called(1);
+      },
+    );
+
+    final newList = List<Repository>.generate(
+        DesignHelper.maxPaginationNumber, (index) => RepositoryDto().convertToDomain());
+    newList.removeAt(0);
+    final expectedPaginationStatesWhenReachedMax = [
+      const HomeState(
+          getHomeInfoStatus: GetHomeInfoStatus.loading, repositories: [], hasReachedMax: false),
+      HomeState(
+          getHomeInfoStatus: GetHomeInfoStatus.success, repositories: newList, hasReachedMax: true),
+    ];
+    // List<Either<Failure, List<Repository>>> expectAnswer = [
+    //   Right(expectedPaginationList),
+    // ];
+    blocTest(
+      'when reached max will not call api',
+      build: () => homeBloc,
+      act: (HomeBloc bloc) async {
+        bloc.add(GetHomeScreenTopRepositoriesEvent());
+        await Future.delayed(const Duration(seconds: 1));
+        bloc.add(GetHomeScreenTopRepositoriesEvent());
+        await Future.delayed(const Duration(seconds: 1));
+        bloc.add(GetHomeScreenTopRepositoriesEvent());
+      },
+      expect: () => expectedPaginationStatesWhenReachedMax,
+      setUp: () {
+        when(mockHomeScreenRepositoriesImpl.getTopRepositories(any)).thenAnswer(
+          (_) async => Right(newList),
+        );
       },
       verify: (bloc) {
         verify(mockHomeScreenRepositoriesImpl.getTopRepositories(any)).called(1);

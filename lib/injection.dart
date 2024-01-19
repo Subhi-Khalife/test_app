@@ -20,7 +20,7 @@ class Injection {
         getTopRepositoriesRemote: serviceLocator<GetTopRepositoriesRemote>()));
     serviceLocator.registerFactory<GetTopRepositoriesRemote>(() => GetTopRepositoriesRemote());
   }
-
+     // Dio
   Dio getNetworkObj() {
     BaseOptions options = BaseOptions(
       baseUrl: Apis.baseUrl,
